@@ -1,0 +1,35 @@
+{
+  "name": "pinned.co",
+  "version": "1.0.0",
+  "description": "A simple real-time chat application built on Node.js",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mohammedfadin/pinned.co.git"
+  },
+  "keywords": [
+    "node.js",
+    "socket.io",
+    "node.js",
+    "chat"
+  ],
+  "author": "MohammedFadin",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mohammedfadin/pinned.co/issues"
+  },
+  "homepage": "https://github.com/mohammedfadin/pinned.co",
+  "dependencies": {
+    "body-parser": "^1.9.2",
+    "errorhandler": "^1.2.2",
+    "express": "^4.10.2",
+    "jade": "^1.7.0",
+    "method-override": "^2.3.0",
+    "morgan": "^1.5.0",
+    "path": "^0.4.9",
+    "socket.io": "^1.2.0"
+  }
+}
