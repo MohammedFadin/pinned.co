@@ -4,3 +4,39 @@ block content
         span=appTitle
         |, a real-time application built on Node.js, Express.js
         | and Socket.IO
+    h3 Chat Window
+    ul#messages
+    h3 Private Window
+    ul#privateMessage
+    form(action="", style="position:fixed; bottom:0;margin:50px; width: 100%;")
+        input#m(autocomplete="off", style="border: 1; padding: 10px; width: 60%; margin-right: .5%;")
+        button Send
+    br
+    button#joinChannel Join General
+
+    script(type='text/javascript').
+        console.log('Initialized by Fadin');       
+        socket = io();
+        sessions = {
+            nickname:'bot',
+            channel: 'general'
+        };         
+        $('form').submit(function(){
+            socket.emit('chat message', $('#m').val());
+            $('#m').val('');
+            console.log('sent');
+            return false;
+        });
+        socket.on('chat message', function(msg){
+            $('#messages').append($('<li>').text(msg));
+        });
+        socket.on('private message', function(msg){
+            $('#privateMessage').append($('<li>').text(msg));
+        });        
+        //- $('#joinChannel').on('click', function(){
+        //-     console.log('clicked');
+        //-     socketGeneral = io('/general');
+        //-     socketGeneral.on('chat message', function(msg){
+        //-         $('#privateMessage').append($('<li>').text(msg));
+        //-         });
+        //-     });

@@ -1,8 +1,11 @@
+doctype html
 html
     head
         title= appTitle
-        meta(name="viewport", content="width=device-width, initial-scale=1.0")
-body
+        meta(name="viewport", content="width=device-width, initial-scale=1.0", dir="ltr")
+        script(src='/socket.io/socket.io.js')
+        script(src="/js/jquery-1.11.1.js")
+body        
     #wrapper
         .container
             h1.page-title= appTitle

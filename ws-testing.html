@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  </head>
+</html>
+<body>       
+  <div id="wrapper">
+    <div class="container">
+      <h1>Testing Native Websocket</h1>
+      <p>Written by Mohammed Fadin</p>
+      <hr>
+      <p>Testing Websocket Built-in module, on Chrome V5</p>
+      <h3>Server Response</h3>
+      <textarea id="serverBox" rows="10" cols="50"></textarea>
+      <h3>Client Send</h3>
+      <textarea id="clientBox" rows="10" cols="50"></textarea>
+      <br/>
+      <button onclick="csocket.onplay(this);">Realtime Update</button>
+    </div>
+  </div>
+</body>
+    <script type="text/javascript">
+      console.log('Wrote by Mohammed Fadin')
+      var csocket = new WebSocket('ws://localhost:4000')
+      var serverTerminal = document.getElementById('serverBox');
+      var clientTerminal = document.getElementById('clientBox');
+
+      csocket.onopen = function (event) {
+          csocket.send('Hello Nomo! This is browser!')
+          clientTerminal.value = clientTerminal.value + '\n Sent: Hello Nomo! This is browser';
+      }
+      csocket.onmessage = function (event) {
+        serverTerminal.value = serverTerminal.value +'\n' + event.data;
+        console.log('Server: ' + event.data)
+      }
+      csocket.onplay = function (event) {
+        csocket.send('Hello Nomo! This is browser!')
+        clientTerminal.value = clientTerminal.value + '\nResent Message';
+        console.log('Client sent from Player');
+      }      
+      csocket.onerror = function (event) {
+          console.log('Server Error Message: ' + event.data)
+      }
+    </script>

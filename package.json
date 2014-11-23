@@ -26,10 +26,12 @@
     "body-parser": "^1.9.2",
     "errorhandler": "^1.2.2",
     "express": "^4.10.2",
+    "install": "^0.1.7",
     "jade": "^1.7.0",
     "method-override": "^2.3.0",
     "morgan": "^1.5.0",
     "path": "^0.4.9",
-    "socket.io": "^1.2.0"
+    "socket.io": "^1.2.0",
+    "ws": "^0.4.32"
   }
 }
