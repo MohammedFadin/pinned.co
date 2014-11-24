@@ -1,42 +1,69 @@
-extends layout
-block content
-    p.desc
-        span=appTitle
-        |, a real-time application built on Node.js, Express.js
-        | and Socket.IO
-    h3 Chat Window
-    ul#messages
-    h3 Private Window
-    ul#privateMessage
-    form(action="", style="position:fixed; bottom:0;margin:50px; width: 100%;")
-        input#m(autocomplete="off", style="border: 1; padding: 10px; width: 60%; margin-right: .5%;")
-        button Send
-    br
-    button#joinChannel Join General
-
-    script(type='text/javascript').
-        console.log('Initialized by Fadin');       
-        socket = io();
-        sessions = {
-            nickname:'bot',
-            channel: 'general'
-        };         
-        $('form').submit(function(){
-            socket.emit('chat message', $('#m').val());
-            $('#m').val('');
-            console.log('sent');
-            return false;
-        });
-        socket.on('chat message', function(msg){
-            $('#messages').append($('<li>').text(msg));
-        });
-        socket.on('private message', function(msg){
-            $('#privateMessage').append($('<li>').text(msg));
-        });        
-        //- $('#joinChannel').on('click', function(){
-        //-     console.log('clicked');
-        //-     socketGeneral = io('/general');
-        //-     socketGeneral.on('chat message', function(msg){
-        //-         $('#privateMessage').append($('<li>').text(msg));
-        //-         });
-        //-     });
+doctype html
+html
+  head
+    meta(charset="utf-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1, maximum-scale=1")
+    meta(name="description", content="")
+    meta(name="author", content="")
+    title=appTitle
+    link(href="css/bootstrap.css", rel="stylesheet")
+    link(href="css/pinned.co.css", rel="stylesheet")
+    script(src="js/jquery-1.11.1.js")
+    script(src="js/bootstrap.min.js")
+  body(style="font-family:Verdana")
+    .container
+      .row(style="padding-top:-50px;")
+        h3.text-center Pinned.CO Chat App
+        .col-md-12
+          .panel.panel-warning
+            .panel-heading
+              |  Channels List
+            .panel-body
+              ul.media-list.list-inline
+                li.media
+                    .btn.btn-default.btn-xs.channel(data-channel="general")
+                        span.label.label-info.onlineCounter 2
+                        span  General
+                li.media
+                    .btn.btn-default.btn-xs.channel(data-channel="dev")
+                        span.label.label-info.onlineCounter 2
+                        span  Dev
+        .col-md-8
+          .panel.panel-info
+            .panel-heading
+              | Chat Window
+            .panel-body.scrollable-div
+              ul.media-list#messagesList
+            .panel-footer
+              .input-group#chatForm
+                input#messageValue.form-control(type="text", placeholder="Enter Message")
+                span.input-group-btn
+                  button.btn.btn-info#chatSendBtn Send
+        .col-md-4
+          .panel.panel-primary
+            .panel-heading
+              |  General Channel
+            .panel-body
+              ul.media-list
+                li.media
+                  .media-body
+                    .media
+                      a.pull-left(href="#")
+                        img.media-object.img-circle(style="max-height:40px;", src="/img/Icon-user.png")
+                      .media-body
+                        h5 Fadin | User
+                        small.text-muted Active From 3 hours
+    .panel-footer
+        p.text-center Pinned.co
+        #chooseNicknameModal.modal.fade(tabindex="-1", role="dialog", aria-labelledby="chooseNicknameLabel", aria-hidden="true")
+          .modal-dialog
+            .modal-content
+              .modal-header
+                h4#chooseNicknameLabel.modal-title Create A Nickname
+              .modal-body
+                form#nicknameForm(role="form")
+                  .form-group
+                    input#nickname.form-control(type="text", required)
+                    button.btn.btn-primary(type="submit") Create
+    script(src="/socket.io/socket.io.js")
+    script(src="js/pinned.co.js")

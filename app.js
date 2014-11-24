@@ -40,7 +40,7 @@ if (require.main === module){
 var io = require('socket.io')(server);
 
 io.on('connection', function (socket) {
-  console.log('A user connected to default room');
+  console.log('A user connected to default');
 
   socket.on('chat message', function (msg) {
     console.log('User Message:' + msg);
@@ -52,11 +52,25 @@ io.on('connection', function (socket) {
   });
 });
 
-var generalRoom = io.of('/general');
+var pinnedNS = io.of('/pinned-ns');
 
-generalRoom.on('connection', function (socket) {
-  console.log('User connected to General Room');
-  generalRoom.emit('chat message', 'Welcome to General Room');
+pinnedNS.on('connection', function (socket) {
+  console.log('User connected to Name Space');
+  
+  socket.on('chat login', function (data) {
+    console.log('User changed Nickname to ' + data.nickname);
+    pinnedNS.emit('chat message', {
+      msg:'Welcome to the General Channel ' + '<em>' + data.nickname + '</em> !',
+      nickname: data.nickname,
+    });    
+  });
+
+  socket.on('chat message', function (data) {
+    pinnedNS.emit('chat message', {
+      msg: data.msg,
+      nickname: data.nickname,
+    })
+  })
 });
 
 // Middleware

@@ -1,0 +1,62 @@
+    script(src="/socket.io/socket.io.js")
+    script(type='text/javascript').
+        $(document).ready(function(){
+            $('#chooseNicknameModal').modal('show');
+        });
+        
+        console.log('Initialized Pinned.co Sockets');       
+        socket = io();
+        sessions = {};
+        messagesList = document.getElementById('messagesList');
+        message = document.getElementById('message');
+        messageRow = new Array();
+        messageBody = new Array();
+        
+        //- messageRow[0] = document.createElement('li');
+        //- messageRow[0].setAttribute('class', 'media');
+        //- messageRow[0].setAttribute('id', 'message');
+
+        //- messageRow[1] = document.createElement('div');
+        //- messageRow[1].setAttribute('class', 'media-body');
+        //- messageRow[1].setAttribute('data-channel', 'test');
+
+        //- messageRow[2] = document.createElement('div');
+        //- messageRow[2].setAttribute('class', 'media');
+
+        //- messageRow[3] = document.createElement('a'); //same
+        //- messageRow[3].setAttribute('class', 'pull-left');
+        
+        //- messageRow[4] = document.createElement('img');
+        //- messageRow[4].setAttribute('class', 'media-object image-circle');
+
+        //- messageRow[5] = document.createElement('div'); //same
+        //- messageRow[5].setAttribute('class', 'media-body');
+       
+        //- messageBody[0] = document.createElement('p');
+        //- messageBody[0].setAttribute('id', 'messageText'); //text
+
+        //- messageBody[1] = document.createElement('br');
+        //- messageBody[2] = document.createElement('small'); //text
+        //- messageBody[2].setAttribute('class', 'text-muted');
+        //- messageBody[3] = document.createElement('hr');
+
+        $('#chatSendBtn').click(function(){
+            socket.emit('chat message', $('#messageValue').val());
+            $('#messageValue').val('');
+            console.log('Message Sent!');
+            return false;
+        });
+        socket.on('chat message', function(data){
+            //- messageRow[4].setAttribute('src', '/img/Icon-user.png');
+            //- messageBody[0].innerHTML = msg;
+            //- messageBody[2].innerHTML = 'AFadin | 24th Nov at 2:00pm';
+            outputMessage = '<li id="message" class="media"><div data-channel="test" class="media-body"><div class="media"><a href="#" class="pull-left"><img src="/img/Icon-user.png" class="media-object img-circle"></a><div class="media-body"><p id="messageText">'+ data +'</p><br><small class="text-muted">Fadin | 24th Nov at 2:00pm</small><hr></div></div></div></li>';
+            messagerow = document.createElement('li');
+            messagerow.setAttribute('class', 'media');
+            messagerow.setAttribute('id', 'message');
+            messagerow.innerHTML = outputMessage;
+            messagesList.appendChild(messagerow);
+        });
+        socket.on('private message', function(msg){
+            $('#privateMessage').append($('<li>').text(msg));
+        });
