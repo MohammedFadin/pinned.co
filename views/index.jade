@@ -8,8 +8,6 @@ html
     title=appTitle
     link(href="css/bootstrap.css", rel="stylesheet")
     link(href="css/pinned.co.css", rel="stylesheet")
-    script(src="js/jquery-1.11.1.js")
-    script(src="js/bootstrap.min.js")
   body(style="font-family:Verdana")
     .container
       .row(style="padding-top:-50px;")
@@ -35,10 +33,11 @@ html
             .panel-body.scrollable-div
               ul.media-list#messagesList
             .panel-footer
-              .input-group#chatForm
-                input#messageValue.form-control(type="text", placeholder="Enter Message")
-                span.input-group-btn
-                  button.btn.btn-info#chatSendBtn Send
+            form#chatForm(role="form", style="margin-top:-15px;")
+                .input-group
+                    input#messageValue.form-control(type="text", placeholder="Enter Message")
+                    span.input-group-btn
+                        button.btn.btn-info#chatSendBtn Send
         .col-md-4
           .panel.panel-primary
             .panel-heading
@@ -63,7 +62,10 @@ html
               .modal-body
                 form#nicknameForm(role="form")
                   .form-group
-                    input#nickname.form-control(type="text", required)
+                    input#nickname.form-control(type="text", autofocus,required)
                     button.btn.btn-primary(type="submit") Create
+        button#sendPrivate submit
+    script(src="js/jquery-1.11.1.js")
+    script(src="js/bootstrap.min.js")
     script(src="/socket.io/socket.io.js")
     script(src="js/pinned.co.js")
