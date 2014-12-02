@@ -1,13 +1,13 @@
 module.exports.listen = function(server) {
-
-  var io = require('socket.io')(server),
-    pinnedNS = io.of('/pinned-ns'),
-    connectedUsers = {},
-    channels = [
-      'general',
-      'programmers',
-      'football',
-    ];
+  var io = require('socket.io')(server);
+  var pinnedNS = io.of('/pinned-ns');
+  var connectedUsers = {}; // Track joined/left users sockets
+  var userSessions = {}; // Track user sockets sessions
+  var channels = [
+    'general',
+    'programmers',
+    'football',
+  ];
 
   // A temporary function to check
   // if the channel requested by user
@@ -22,8 +22,10 @@ module.exports.listen = function(server) {
 
   pinnedNS.on('connection', function(client) {
     console.log('User connected to Pinned-NS');
+
     client.on('chat login', function(msg) {
       console.log(msg.nickname + ' has logged in to Pinned Name Space');
+
       // store users nickname
       // and channel, in a global var
       connectedUsers[msg.nickname] = {};
@@ -43,7 +45,8 @@ module.exports.listen = function(server) {
 
     // User broadcasts a message to others
     // except him
-    client.on('chat message', function(msg) {
+    client.on('chat message', function(msg, ack) {
+      ack({request:{status:200, msg: 'Successful'}});
       client.broadcast.to(connectedUsers[msg.nickname].channel).emit('chat message', {
         context: msg.context,
         nickname: msg.nickname,
@@ -53,10 +56,13 @@ module.exports.listen = function(server) {
     // User want to send private message
     // to another user
     client.on('chat private', function(msg) {
-      connectedUsers[msg.recipient].emit('chat private', {
+
+      // Emit to the recipient
+      connectedUsers[msg.to].socket.emit('chat private', {
         context: msg.context,
-        from: connectedUsers[msg.sender].nickname,
-        to: connectedUsers[msg.recipient].nickname,
+        from: connectedUsers[msg.from].nickname,
+        to: connectedUsers[msg.to].nickname,
+        time: new Date().getTime()
       });
     });
     // User disconnects

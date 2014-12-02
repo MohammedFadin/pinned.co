@@ -3,6 +3,7 @@
         var messagesList = document.getElementById('messagesList');
         var message = document.getElementById('message');
         var messageRow = new Array();
+
         var outputMessage = function(data) {
             var messagerow = document.createElement('li');
             messagerow.setAttribute('class', 'media');
@@ -51,6 +52,11 @@
             socket.emit('chat message', {
                 context: '<em>' + nickname + '</em>' + ' has joined the general channel!',
                 nickname: nickname,
+            }, function(ackData) {
+                messagesList.appendChild(outputMessage({
+                    context: '<em>' + nickname + '</em>' + ' has joined the general channel!',
+                    nickname: nickname,
+                }));
             });
 
             return false;
@@ -81,11 +87,11 @@
         $('#sendPrivate').click(function() {
             socket.emit('chat private', {
                 context: 'Ahlan bro!',
-                recipient: 'hassan',
-                sender: 'fadin',
+                from: 'fadin',
+                to: 'hassan',
             });
         });
 
         socket.on('chat private', function(msg) {
-            console.log(msg.from + ': ' + msg.context);
+            console.log(msg.from + ': ' + msg.context + ' Time ' + msg.time);
         });
