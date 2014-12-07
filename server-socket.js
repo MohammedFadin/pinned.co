@@ -1,3 +1,4 @@
+'use strict';
 module.exports.listen = function(server) {
   var io = require('socket.io')(server);
   var pinnedNS = io.of('/pinned-ns');
@@ -6,12 +7,9 @@ module.exports.listen = function(server) {
   var channels = [
     'general',
     'programmers',
-    'football',
+    'football'
   ];
-
-  // A temporary function to check
-  // if the channel requested by user
-  // is valid or not
+  // Check if channel exists
   var joinTo = function(channel) {
     if (!channels.indexOf(channel)) {
       return channels[0];
@@ -21,8 +19,7 @@ module.exports.listen = function(server) {
   }
 
   pinnedNS.on('connection', function(client) {
-    console.log('User connected to Pinned-NS');
-
+    console.log('A socket connection has established');
     client.on('chat login', function(msg) {
       console.log(msg.nickname + ' has logged in to Pinned Name Space');
 
@@ -33,31 +30,49 @@ module.exports.listen = function(server) {
       connectedUsers[msg.nickname].nickname = msg.nickname;
     });
 
-    // If clients emits to subscribe to a channel
-    // we check channel before subscribing
+    /*
+      On user joins a channel/room
+     */
     client.on('chat subscribe', function(msg) {
+      // Detect if same user joined
+      // with multiple sockets
+      for (var prop in userSessions[msg.nickname]) {
+        if (userSessions[msg.nickname].hasOwnProperty('socket')) {
+          console.log('User established connection twice, kick him!');
+          userSessions[msg.nickname].socket.disconnect();
+          delete userSessions[msg.nickname];
+        }
+      }
+      userSessions[msg.nickname] = {};
+      userSessions[msg.nickname].socket = client;
       // Store the user channel
       connectedUsers[msg.nickname].channel = joinTo(msg.channel);
+      client.join(joinTo(msg.channel)); // Welcome Message
       console.log('client joined this ' + connectedUsers[msg.nickname].channel);
-      // Broadcast a welcome message to the users
-      client.join(joinTo(msg.channel));
     });
 
-    // User broadcasts a message to others
-    // except him
+    /*
+      On user broadcasts a message to the
+      joined-in channel
+     */
     client.on('chat message', function(msg, ack) {
-      ack({request:{status:200, msg: 'Successful'}});
+      ack({
+        request: {
+          status: 200,
+          msg: 'Successful'
+        }
+      });
       client.broadcast.to(connectedUsers[msg.nickname].channel).emit('chat message', {
         context: msg.context,
         nickname: msg.nickname,
       });
     });
 
-    // User want to send private message
-    // to another user
+    /*
+      On user sends a private message to
+      another user in same channel
+     */
     client.on('chat private', function(msg) {
-
-      // Emit to the recipient
       connectedUsers[msg.to].socket.emit('chat private', {
         context: msg.context,
         from: connectedUsers[msg.from].nickname,
@@ -65,9 +80,20 @@ module.exports.listen = function(server) {
         time: new Date().getTime()
       });
     });
-    // User disconnects
-    client.on('disconnect', function() {
+
+    /*
+      On user leavs a channel/room
+     */
+    client.on('chat leave', function() {
       client.leave();
+      console.log('A user left from channel/room');
+    });
+
+    /*
+      On user connections disconnects
+     */
+    client.on('disconnect', function() {
+      client.disconnect();
       console.log('A user disconnected from Pinned.CO');
     });
   });
