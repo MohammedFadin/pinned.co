@@ -174,11 +174,10 @@ socket.on('user left', function(data) {
     scrollItDown();
 });
 socket.on('user typing', function(data) {
-    $('#typing').fadeIn();
-    scrollItDown();
+    $('.typing-alert').fadeIn();
 });
 socket.on('user stopped typing', function (data) {
-    $('#typing').fadeOut();
+    $('.typing-alert').fadeOut();
     scrollItDown();
 })
 socket.on('disconnect', function() {

@@ -33,13 +33,14 @@ html
             .panel-body.scrollable-div
               ul.media-list#messagesList
               p#typing(style="background-color:#f6fbfc; padding: 10px;" hidden) Typing .....
+              span.typing-alert.alert.alert-dismissable.alert-success(style="padding: 5px;",hidden)
+                strong Typing......
             .panel-footer
             form#chatForm(role="form", style="margin-top:-15px;")
                 .input-group
                     input#messageValue.form-control(type="text", placeholder="Enter Message")
                     span.input-group-btn
                         button.btn.btn-info#chatSendBtn Send
-
         .col-md-3
           .panel.panel-primary
             .panel-heading
@@ -89,6 +90,7 @@ html
                     input#nickname.form-control(type="text", autofocus,required)
                     button.btn.btn-primary(type="submit") Create
         button#sendPrivate submit
+
 
     script(src="js/jquery-1.11.1.js")
     script(src="js/bootstrap.min.js")
