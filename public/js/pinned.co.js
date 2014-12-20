@@ -152,6 +152,8 @@ $('#sendPrivate').click(function() {
 // })
 socket.on('chat message', function(data) {
     messagesList.appendChild(outputMessage(data));
+    var snd = new Audio("./sounds/msg-notification.mp3"); // buffers automatically when created
+    snd.play();
     scrollItDown();
 });
 socket.on('chat history counter', function (data) {
@@ -181,7 +183,7 @@ socket.on('user stopped typing', function (data) {
 })
 socket.on('disconnect', function() {
     console.log("Multiple name sessions detected");
-    // alert('Kicked Current Session!');
+    alert('Bye Bye!');
 });
 
 /*

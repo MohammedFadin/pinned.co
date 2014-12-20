@@ -54,6 +54,7 @@ module.exports.listen = function(server) {
       userSessions[msg.nickname].socket = client;
       client.nickname = msg.nickname;
       client.channel = joinTo(msg.channel);
+      console.log(connectedUsers[msg.nickname].channel);
       connectedUsers[msg.nickname].channel = joinTo(msg.channel);
       client.join(joinTo(msg.channel)); // Welcome Message
       pinnedNS.emit('chat history counter', {totalJoined: ++chatHistoryCounter})
@@ -61,10 +62,6 @@ module.exports.listen = function(server) {
         totalUsers: Object.keys(connectedUsers).length
       });
       console.log('client joined this ' + connectedUsers[msg.nickname].channel);
-    });
-
-    client.on('chat subscribe channel', function (msg) {
-
     });
 
     /*
@@ -120,7 +117,7 @@ module.exports.listen = function(server) {
         totalUsers: Object.keys(connectedUsers).length - 1,
         nickname: client.nickname
       });
-      delete connectedUsers[client.nickname];
+      delete userSessions[client.nickname];
       client.disconnect();
     });
   });
