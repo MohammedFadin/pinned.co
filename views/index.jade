@@ -11,7 +11,7 @@ html
   body(style="font-family:Verdana")
     .container
       .row(style="padding-top:-50px;")
-        h3.text-center Pinned.CO Chat App
+        h3.text-center Pinned.co Chat App
         .col-md-12
           .panel.panel-warning
             .panel-heading
@@ -19,26 +19,54 @@ html
             .panel-body
               ul.media-list.list-inline
                 li.media
-                    .btn.btn-default.btn-xs.channel(data-channel="general")
+                    .btn.btn-default.btn-xs.channels.card(data-channel="general")
                         span.label.label-info.onlineCounter 2
                         span  General
                 li.media
-                    .btn.btn-default.btn-xs.channel(data-channel="dev")
+                    .btn.btn-default.btn-xs.channels.card(data-channel="dev")
                         span.label.label-info.onlineCounter 2
                         span  Dev
-        .col-md-8
+        .col-md-9
           .panel.panel-info
             .panel-heading
               | Chat Window
-            .panel-body.scrollable-div
-              ul.media-list#messagesList
+            ul.nav.nav-tabs.channels.tabs
+              li#general-tab.active
+                a(href='#general', data-toggle='tab', aria-expanded='true') General
+            #channelsTabsContent.tab-content
+              #general.tab-pane.fade.active.in
+                .panel-body.scrollable-div
+                  ul.media-list#messagesList-general
+              p#typing(style="background-color:#f6fbfc; padding: 10px;" hidden) Typing .....
             .panel-footer
             form#chatForm(role="form", style="margin-top:-15px;")
                 .input-group
                     input#messageValue.form-control(type="text", placeholder="Enter Message")
                     span.input-group-btn
                         button.btn.btn-info#chatSendBtn Send
-        .col-md-4
+        .col-md-3
+          .panel.panel-primary
+            .panel-heading
+              | Chat Statistics
+            .panel-body
+              ul.media-list
+                li.media
+                  .media-body
+                    .media
+                      a.pull-left(href="#")
+                        img.media-object.img-circle(style="max-height:40px;", src="/img/Icon-user.png")
+                      .media-body
+                        h5 Users Online: &nbsp;
+                          span#totalOnline
+                li.media
+                  .media-body
+                    .media
+                      a.pull-left(href="#")
+                        img.media-object.img-circle(style="max-height:40px;", src="/img/Icon-user.png")
+                      .media-body
+                        h5 Total Joined: &nbsp;
+                          span#totalJoined
+        .col-md-3
           .panel.panel-primary
             .panel-heading
               |  General Channel
@@ -65,6 +93,7 @@ html
                     input#nickname.form-control(type="text", autofocus,required)
                     button.btn.btn-primary(type="submit") Create
         button#sendPrivate submit
+
     script(src="js/jquery-1.11.1.js")
     script(src="js/bootstrap.min.js")
     script(src="/socket.io/socket.io.js")
