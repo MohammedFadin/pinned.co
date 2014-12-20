@@ -16,7 +16,7 @@ var socket, sessions, message,
 
 socket = io('/pinned-ns');
 sessions = {};
-//messagesList = document.getElementById('messagesList');
+messagesList = document.getElementById('messagesList');
 message = document.getElementById('message');
 messageRow = [];
 var channelTabs = document.getElementsByClassName('channels tabs');
@@ -72,7 +72,7 @@ $('#nicknameForm').submit(function() {
         nickname: nickname,
     }, function(ackData) {
         console.log(ackData);
-        var messagesList = document.getElementById('messagesList-general')
+        // var messagesList = document.getElementById('messagesList-general')
         messagesList.appendChild(outputMessage({
             context: nickname + ' has joined the general channel!',
             nickname: nickname,
@@ -92,10 +92,9 @@ $(window).keydown(function (event) {
 })
 $('#chatSendBtn').click(function() {
     // Here we check which channel tab is active
-    var currChannel = $('.tab-pane.active').attr('id');
+    // var currChannel = $('.tab-pane.active').attr('id');
 
-    var messagesList = document.getElementById('messagesList-'+currChannel);
-
+    // var messagesList = document.getElementById('messagesList-'+currChannel);
     messagesList.appendChild(outputMessage({
         context: $('#messageValue').val(),
         nickname: $('#nickname').val()
@@ -104,7 +103,7 @@ $('#chatSendBtn').click(function() {
     socket.emit('chat message', {
         context: $('#messageValue').val(),
         nickname: $('#nickname').val(),
-        channel: currChannel,
+        // channel: currChannel,
     }, function(ackData) {
     });
     $('#messageValue').val('');
@@ -123,34 +122,34 @@ $('#sendPrivate').click(function() {
     });
 });
 
-$(document).on("click", ".channels.card", function (e) {
-    var btn = $(this).attr("data-channel");
-    var tabsMainDiv = document.getElementById('channelsTabsContent');
+// $(document).on("click", ".channels.card", function (e) {
+//     var btn = $(this).attr("data-channel");
+//     var tabsMainDiv = document.getElementById('channelsTabsContent');
 
-    if ($('#'+btn).length === 0){
-        var atab = document.createElement('li');
-        $('.nav.nav-tabs.channels.tabs li').removeClass('active');
-            atab.setAttribute('id', btn+'-tab');
-            atab.setAttribute('class', 'active');
-        var tabStyle = '<a href="#'+btn+'" data-toggle="tab" aria-expanded="true">'+btn+'</a>';
-        var tabHTMLContent = '<div class="panel-body scrollable-div"><ul id="messagesList-'+btn+'" class="media-list"></ul></div>'
-        var tabNodeContent = document.createElement('div');
-            tabNodeContent.setAttribute('class', 'tab-pane fade');
-            tabNodeContent.setAttribute('id', btn);
-        tabNodeContent.innerHTML = tabHTMLContent;
-        atab.innerHTML = tabStyle;
+//     if ($('#'+btn).length === 0){
+//         var atab = document.createElement('li');
+//         $('.nav.nav-tabs.channels.tabs li').removeClass('active');
+//             atab.setAttribute('id', btn+'-tab');
+//             atab.setAttribute('class', 'active');
+//         var tabStyle = '<a href="#'+btn+'" data-toggle="tab" aria-expanded="true">'+btn+'</a>';
+//         var tabHTMLContent = '<div class="panel-body scrollable-div"><ul id="messagesList-'+btn+'" class="media-list"></ul></div>'
+//         var tabNodeContent = document.createElement('div');
+//             tabNodeContent.setAttribute('class', 'tab-pane fade');
+//             tabNodeContent.setAttribute('id', btn);
+//         tabNodeContent.innerHTML = tabHTMLContent;
+//         atab.innerHTML = tabStyle;
 
-        channelTabs[0].appendChild(atab);
-        tabsMainDiv.appendChild(tabNodeContent);
-        $('.tab-content .tab-pane').removeClass('active');
-        $('#'+btn).addClass('active');
-    }else{
-        $('.nav.nav-tabs.channels.tabs li').removeClass('active');
-        $('#'+btn+'-tab').addClass('active');
-        $('.tab-content .tab-pane').removeClass('active');
-        $('#'+btn).addClass('active');
-    }
-})
+//         channelTabs[0].appendChild(atab);
+//         tabsMainDiv.appendChild(tabNodeContent);
+//         $('.tab-content .tab-pane').removeClass('active');
+//         $('#'+btn).addClass('active');
+//     }else{
+//         $('.nav.nav-tabs.channels.tabs li').removeClass('active');
+//         $('#'+btn+'-tab').addClass('active');
+//         $('.tab-content .tab-pane').removeClass('active');
+//         $('#'+btn).addClass('active');
+//     }
+// })
 socket.on('chat message', function(data) {
     messagesList.appendChild(outputMessage(data));
     scrollItDown();

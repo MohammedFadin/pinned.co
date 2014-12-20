@@ -26,17 +26,12 @@ html
                     .btn.btn-default.btn-xs.channels.card(data-channel="dev")
                         span.label.label-info.onlineCounter 2
                         span  Dev
-        .col-md-9
+       .col-md-9
           .panel.panel-info
             .panel-heading
               | Chat Window
-            ul.nav.nav-tabs.channels.tabs
-              li#general-tab.active
-                a(href='#general', data-toggle='tab', aria-expanded='true') General
-            #channelsTabsContent.tab-content
-              #general.tab-pane.fade.active.in
-                .panel-body.scrollable-div
-                  ul.media-list#messagesList-general
+            .panel-body.scrollable-div
+              ul.media-list#messagesList
               p#typing(style="background-color:#f6fbfc; padding: 10px;" hidden) Typing .....
             .panel-footer
             form#chatForm(role="form", style="margin-top:-15px;")
@@ -44,6 +39,7 @@ html
                     input#messageValue.form-control(type="text", placeholder="Enter Message")
                     span.input-group-btn
                         button.btn.btn-info#chatSendBtn Send
+
         .col-md-3
           .panel.panel-primary
             .panel-heading
