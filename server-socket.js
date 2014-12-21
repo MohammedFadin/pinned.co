@@ -48,6 +48,7 @@ module.exports.listen = function(server) {
           // });
           userSessions[msg.nickname].socket.disconnect();
           delete userSessions[msg.nickname];
+          delete connectedUsers[msg.nickname];
         }
       }
       userSessions[msg.nickname] = {};
@@ -113,11 +114,13 @@ module.exports.listen = function(server) {
      */
     client.on('disconnect', function() {
       console.log(client.nickname + ' disconnected from Pinned.CO');
+      var curr = Object.keys(connectedUsers).length;
       client.broadcast.emit('user left', {
-        totalUsers: Object.keys(connectedUsers).length - 1,
+        totalUsers: curr - 1,
         nickname: client.nickname
       });
       delete userSessions[client.nickname];
+      delete connectedUsers[client.nickname];
       client.disconnect();
     });
   });

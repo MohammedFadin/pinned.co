@@ -12,7 +12,7 @@ app.locals.appTitle = 'Pinned.co';
 // Database
 
 // Configuration
-app.set('port', process.env.PORT || CONFIG.port);
+app.set('port', process.env.PORT || CONFIG.port ); //CONFIG.port
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 

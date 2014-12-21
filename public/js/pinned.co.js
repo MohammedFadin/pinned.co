@@ -83,7 +83,7 @@ $('#nicknameForm').submit(function() {
 
 $('#messageValue').on('input', function () {
     socket.emit('user typing');
-    console.log('input event working')
+    // console.log('input event working')
 })
 $(window).keydown(function (event) {
     if (event.which === 13){
@@ -181,7 +181,6 @@ socket.on('user stopped typing', function (data) {
     scrollItDown();
 })
 socket.on('disconnect', function() {
-    console.log("Multiple name sessions detected");
     alert('Bye Bye!');
 });
 
