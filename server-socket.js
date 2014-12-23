@@ -37,31 +37,27 @@ module.exports.listen = function(server) {
       On user joins a channel/room
      */
     client.on('chat subscribe', function(msg) {
-      // Detect if same user joined
-      // with multiple sockets
+      // Check if user has multiple sockets online
       for (var prop in userSessions[msg.nickname]) {
-        if (userSessions[msg.nickname].hasOwnProperty('socket')) {
-          console.log('User established connection twice, kick him!');
-          // userSessions[msg.nickname].socket.broadcast.emit('chat message', {
-          //   context: msg.nickname + ' has rejoined the channel!',
-          //   nickname: pinnedBOTName
-          // });
-          userSessions[msg.nickname].socket.disconnect();
-          delete userSessions[msg.nickname];
-          delete connectedUsers[msg.nickname];
+        if (userSessions[msg.nickname].hasOwnProperty('connected')) {
+          client.disconnect();
         }
       }
       userSessions[msg.nickname] = {};
-      userSessions[msg.nickname].socket = client;
+      userSessions[msg.nickname].connected = true;
       client.nickname = msg.nickname;
       client.channel = joinTo(msg.channel);
       console.log(connectedUsers[msg.nickname].channel);
       connectedUsers[msg.nickname].channel = joinTo(msg.channel);
-      client.join(joinTo(msg.channel)); // Welcome Message
-      pinnedNS.emit('chat history counter', {totalJoined: ++chatHistoryCounter})
+      client.join(joinTo(msg.channel));
+
+      pinnedNS.emit('chat history counter', {
+        totalJoined: ++chatHistoryCounter
+      })
       pinnedNS.emit('user joined', {
         totalUsers: Object.keys(connectedUsers).length
       });
+
       console.log('client joined this ' + connectedUsers[msg.nickname].channel);
     });
 
@@ -94,7 +90,13 @@ module.exports.listen = function(server) {
         time: new Date().getTime() // Change to getHours
       });
     });
-
+    client.on('user check', function (data, cb) {
+      if (connectedUsers.hasOwnProperty(data.nickname)){
+        cb({connected: true});
+      }else{
+        cb({connected: false});
+      }
+    })
     /*
       On user leavs a channel/room
       but still connected to namespace
@@ -103,11 +105,11 @@ module.exports.listen = function(server) {
       client.leave();
       console.log('A user left from channel/room');
     });
-    client.on('user typing', function () {
-        client.broadcast.to(client.channel).emit('user typing')
+    client.on('user typing', function() {
+      client.broadcast.to(client.channel).emit('user typing')
     })
-    client.on('user stopped typing', function () {
-        client.broadcast.to(client.channel).emit('user stopped typing')
+    client.on('user stopped typing', function() {
+      client.broadcast.to(client.channel).emit('user stopped typing')
     })
     /*
       On user connections disconnects
@@ -120,7 +122,6 @@ module.exports.listen = function(server) {
         nickname: client.nickname
       });
       delete userSessions[client.nickname];
-      delete connectedUsers[client.nickname];
       client.disconnect();
     });
   });

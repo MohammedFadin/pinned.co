@@ -12,7 +12,7 @@ jQuery,console, $
 
 var socket, sessions, message,
     messageRow, scrollItDown, outputMessage,
-    clearUserInput;
+    clearUserInput, createCookie, readCookie, eraseCookie;
 
 socket = io('/pinned-ns');
 sessions = {};
@@ -41,14 +41,55 @@ OutputCurrentOnlineUsers = function(data) {
 clearUserInput = function(input) {
     return $('<div/>').text(input).html();
 };
+createCookie = function(name, value, days) {
+    if (days) {
+        var date = new Date();
+        date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+        var expires = "; expires=" + date.toGMTString();
+    } else var expires = "";
+    document.cookie = name + "=" + value + expires + "; path=/";
+};
+readCookie = function(name) {
+    var nameEQ = name + "=";
+    var ca = document.cookie.split(';');
+    for (var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+    }
+    return null;
+};
+eraseCookie = function(name) {
+    createCookie(name, "", -1);
+};
 
 $(document).ready(function() {
     console.log('Initialized Pinned.co Sockets');
-    $('#chooseNicknameModal').modal({
-        backdrop: 'static',
-        show: true,
-        keyboard: false,
-    });
+    var usernameCookie = readCookie('pinned.co-user') || null;
+    if (!usernameCookie) {
+        $('#chooseNicknameModal').modal({
+            backdrop: 'static',
+            show: true,
+            keyboard: false,
+        });
+    } else {
+        socket.emit('chat login', {
+            nickname: usernameCookie,
+        });
+        socket.emit('chat subscribe', {
+            nickname: usernameCookie,
+            channel: 'general'
+        });
+        socket.emit('chat message', {
+            context: usernameCookie + ' has joined the general channel!',
+            nickname: usernameCookie,
+        }, function(ackData) {
+            messagesList.appendChild(outputMessage({
+                context: usernameCookie + ' has joined the general channel!',
+                nickname: usernameCookie,
+            }));
+        });
+    }
 });
 
 $('#nicknameForm').submit(function() {
@@ -63,6 +104,19 @@ $('#nicknameForm').submit(function() {
     socket.emit('chat login', {
         nickname: nickname,
     });
+    // socket.emit('user check', {
+    //     nickname: nickname
+    // }, function (data) {
+    //     if (!data.connected){
+    //         $('#chooseNicknameModal').modal({
+    //             backdrop: 'static',
+    //             show: true,
+    //             keyboard: false,
+    //         });
+    //     console.log('user connected with username already')
+    //     }
+    //     return;
+    // });
     socket.emit('chat subscribe', {
         nickname: nickname,
         channel: 'general'
@@ -78,15 +132,18 @@ $('#nicknameForm').submit(function() {
             nickname: nickname,
         }));
     });
+
+    // Set user cookie
+    createCookie('pinned.co-user', nickname, 0);
     return false;
 });
 
-$('#messageValue').on('input', function () {
+$('#messageValue').on('input', function() {
     socket.emit('user typing');
     // console.log('input event working')
 })
-$(window).keydown(function (event) {
-    if (event.which === 13){
+$(window).keydown(function(event) {
+    if (event.which === 13) {
         socket.emit('user stopped typing');
     }
 })
@@ -104,8 +161,7 @@ $('#chatSendBtn').click(function() {
         context: $('#messageValue').val(),
         nickname: $('#nickname').val(),
         // channel: currChannel,
-    }, function(ackData) {
-    });
+    }, function(ackData) {});
     $('#messageValue').val('');
     $('#messageValue').focus();
     scrollItDown();
@@ -156,7 +212,7 @@ socket.on('chat message', function(data) {
     snd.play();
     scrollItDown();
 });
-socket.on('chat history counter', function (data) {
+socket.on('chat history counter', function(data) {
     $('#totalJoined').html(data.totalJoined);
 });
 socket.on('private message', function(msg) {
@@ -176,12 +232,14 @@ socket.on('user left', function(data) {
 socket.on('user typing', function(data) {
     $('.typing-alert').fadeIn();
 });
-socket.on('user stopped typing', function (data) {
+socket.on('user stopped typing', function(data) {
     $('.typing-alert').fadeOut();
     scrollItDown();
 })
+
 socket.on('disconnect', function() {
-    alert('Bye Bye!');
+    alert('Username is connected already!');
+    eraseCookie('pinned.co-user')
 });
 
 /*

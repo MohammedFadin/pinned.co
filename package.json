@@ -26,6 +26,7 @@
     "body-parser": "^1.9.2",
     "errorhandler": "^1.2.2",
     "express": "^4.10.2",
+    "forever": "^0.13.0",
     "install": "^0.1.7",
     "jade": "^1.7.0",
     "method-override": "^2.3.0",
