@@ -24,8 +24,16 @@ module.exports.listen = function(server) {
   pinnedNS.on('connection', function(client) {
     console.log('A socket connection has established');
     client.on('chat login', function(msg) {
+      // Check if user has multiple sockets online
+      for (var prop in userSessions[msg.nickname]) {
+        if (userSessions[msg.nickname].hasOwnProperty('connected')) {
+          //Generate a new username
+          msg.nickname = msg.nickname + '-' + Math.floor(Math.random() * (20 - 10) + 10);
+          // client.emit('user logged in', {username: msg.nickname});
+        }
+      }
       console.log(msg.nickname + ' has logged in to Pinned Name Space');
-
+      client.emit('user logged in', {username: msg.nickname});
       // store users nickname
       // and channel, in a global var
       connectedUsers[msg.nickname] = {};
@@ -37,17 +45,12 @@ module.exports.listen = function(server) {
       On user joins a channel/room
      */
     client.on('chat subscribe', function(msg) {
-      // Check if user has multiple sockets online
-      for (var prop in userSessions[msg.nickname]) {
-        if (userSessions[msg.nickname].hasOwnProperty('connected')) {
-          client.disconnect();
-        }
-      }
+
       userSessions[msg.nickname] = {};
       userSessions[msg.nickname].connected = true;
       client.nickname = msg.nickname;
+      console.log('Dude what is ' + client.nickname)
       client.channel = joinTo(msg.channel);
-      console.log(connectedUsers[msg.nickname].channel);
       connectedUsers[msg.nickname].channel = joinTo(msg.channel);
       client.join(joinTo(msg.channel));
 
@@ -72,7 +75,7 @@ module.exports.listen = function(server) {
           msg: 'Successful'
         }
       });
-      client.broadcast.to(connectedUsers[msg.nickname].channel).emit('chat message', {
+      client.broadcast.to('general').emit('chat message', {
         context: msg.context,
         nickname: msg.nickname,
       });
@@ -122,6 +125,7 @@ module.exports.listen = function(server) {
         nickname: client.nickname
       });
       delete userSessions[client.nickname];
+      delete connectedUsers[client.nickname];
       client.disconnect();
     });
   });

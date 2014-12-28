@@ -12,14 +12,16 @@ jQuery,console, $
 
 var socket, sessions, message,
     messageRow, scrollItDown, outputMessage,
-    clearUserInput, createCookie, readCookie, eraseCookie;
+    clearUserInput, createCookie, readCookie, eraseCookie,
+    username, channelTabs;
 
 socket = io('/pinned-ns');
 sessions = {};
 messagesList = document.getElementById('messagesList');
 message = document.getElementById('message');
 messageRow = [];
-var channelTabs = document.getElementsByClassName('channels tabs');
+username;
+channelTabs = document.getElementsByClassName('channels tabs');
 
 scrollItDown = function() {
     $('.scrollable-div').stop().animate({
@@ -65,35 +67,40 @@ eraseCookie = function(name) {
 
 $(document).ready(function() {
     console.log('Initialized Pinned.co Sockets');
-    var usernameCookie = readCookie('pinned.co-user') || null;
-    if (!usernameCookie) {
+    //username = readCookie('pinned.co-user') || null;
         $('#chooseNicknameModal').modal({
             backdrop: 'static',
             show: true,
             keyboard: false,
         });
-    } else {
-        socket.emit('chat login', {
-            nickname: usernameCookie,
-        });
-        socket.emit('chat subscribe', {
-            nickname: usernameCookie,
-            channel: 'general'
-        });
-        socket.emit('chat message', {
-            context: usernameCookie + ' has joined the general channel!',
-            nickname: usernameCookie,
-        }, function(ackData) {
-            messagesList.appendChild(outputMessage({
-                context: usernameCookie + ' has joined the general channel!',
-                nickname: usernameCookie,
-            }));
-        });
-    }
+    // if (!username) {
+    //     $('#chooseNicknameModal').modal({
+    //         backdrop: 'static',
+    //         show: true,
+    //         keyboard: false,
+    //     });
+    // } else {
+    //     socket.emit('chat login', {
+    //         nickname: username,
+    //     });
+    //     socket.emit('chat subscribe', {
+    //         nickname: username,
+    //         channel: 'general'
+    //     });
+    //     socket.emit('chat message', {
+    //         context: username + ' has joined the general channel!',
+    //         nickname: username,
+    //     }, function(ackData) {
+    //         messagesList.appendChild(outputMessage({
+    //             context: username + ' has joined the general channel!',
+    //             nickname: username,
+    //         }));
+    //     });
+    // }
 });
 
 $('#nicknameForm').submit(function() {
-    var nickname = $('#nickname').val();
+    username = $('#nickname').val();
 
     if (!$('#nickname').length) {
         return false;
@@ -102,7 +109,7 @@ $('#nicknameForm').submit(function() {
     $('#chooseNicknameModal').modal('hide');
 
     socket.emit('chat login', {
-        nickname: nickname,
+        nickname: username,
     });
     // socket.emit('user check', {
     //     nickname: nickname
@@ -117,24 +124,25 @@ $('#nicknameForm').submit(function() {
     //     }
     //     return;
     // });
-    socket.emit('chat subscribe', {
-        nickname: nickname,
-        channel: 'general'
-    });
-    socket.emit('chat message', {
-        context: nickname + ' has joined the general channel!',
-        nickname: nickname,
-    }, function(ackData) {
-        console.log(ackData);
-        // var messagesList = document.getElementById('messagesList-general')
-        messagesList.appendChild(outputMessage({
-            context: nickname + ' has joined the general channel!',
-            nickname: nickname,
-        }));
-    });
+
+    // socket.emit('chat subscribe', {
+    //     nickname: username,
+    //     channel: 'general'
+    // });
+    // socket.emit('chat message', {
+    //     context: username + ' has joined the general channel!',
+    //     nickname: username,
+    // }, function(ackData) {
+    //     console.log(ackData);
+    //     // var messagesList = document.getElementById('messagesList-general')
+    //     messagesList.appendChild(outputMessage({
+    //         context: username + ' has joined the general channel!',
+    //         nickname: username,
+    //     }));
+    // });
 
     // Set user cookie
-    createCookie('pinned.co-user', nickname, 0);
+    //createCookie('pinned.co-user', username, 0);
     return false;
 });
 
@@ -154,12 +162,12 @@ $('#chatSendBtn').click(function() {
     // var messagesList = document.getElementById('messagesList-'+currChannel);
     messagesList.appendChild(outputMessage({
         context: $('#messageValue').val(),
-        nickname: $('#nickname').val()
+        nickname: username
     }));
 
     socket.emit('chat message', {
         context: $('#messageValue').val(),
-        nickname: $('#nickname').val(),
+        nickname: username,
         // channel: currChannel,
     }, function(ackData) {});
     $('#messageValue').val('');
@@ -206,6 +214,27 @@ $('#sendPrivate').click(function() {
 //         $('#'+btn).addClass('active');
 //     }
 // })
+socket.on('user logged in', function (data) {
+    username = data.username || username;
+    socket.emit('chat subscribe', {
+        nickname: username,
+        channel: 'general'
+    });
+    socket.emit('chat message', {
+        context: username + ' has joined the general channel!',
+        nickname: username,
+    }, function(ackData) {
+        console.log(ackData);
+        // var messagesList = document.getElementById('messagesList-general')
+        messagesList.appendChild(outputMessage({
+            context: username + ' has joined the general channel!',
+            nickname: username,
+        }));
+    });
+});
+socket.on('user new username', function (data) {
+    username = data.nickname;
+})
 socket.on('chat message', function(data) {
     messagesList.appendChild(outputMessage(data));
     var snd = new Audio("./sounds/msg-notification.mp3"); // buffers automatically when created
@@ -238,10 +267,16 @@ socket.on('user stopped typing', function(data) {
 })
 
 socket.on('disconnect', function() {
-    alert('Username is connected already!');
-    eraseCookie('pinned.co-user')
 });
 
+// socket.on('user clear cache', function () {
+//     eraseCookie('pinned.co-user', username, 0);
+// })
+
+// socket.on('user force logout', function () {
+//     socket.disconnect({duplicate: true});
+//     console.log('You have been forced to disconnect');
+// })
 /*
     TODO: 'refactor appending messages',
           'rename listeners',
